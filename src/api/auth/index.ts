@@ -1,3 +1,6 @@
+import Cookies from "js-cookie";
+import { useRouter } from "next/navigation";
+
 const userSigninRequest = async (email: string, password: string) => {
   const response = await fetch(
     process.env.NEXT_PUBLIC_AUTH_USER_SIGNIN as string,
@@ -35,8 +38,22 @@ const userSignupRequest = async (
   return response;
 };
 
-const userVerification = async (email: string) => {
+const userVerification = async () => {
+  const token = Cookies.get("token");
 
+  const response = await fetch(
+    process.env.NEXT_PUBLIC_AUTH_TOKEN_VERIFICATION as string,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  const data = await response.json();
+  return data;
 };
 
-export { userSigninRequest, userSignupRequest };
+export { userSigninRequest, userSignupRequest, userVerification };

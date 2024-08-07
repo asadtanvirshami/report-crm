@@ -28,11 +28,15 @@ import {
 import { Separator } from "../separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../tabs";
 import { TooltipProvider } from "../tooltip";
-import { MailDisplay } from "@/components/ui/mail/mail-display";
-import { MailList } from "@/components/ui/mail/mail-list";
+import TruckList from "@/components/ui/mail/mail-list";
 import { Nav } from "@/components/ui/nav";
 import { type Mail } from "@/data/data";
 import { useMail } from "@/app/jotai/atoms/mail-atom";
+import SendMail from "./mail-display";
+import { userVerification } from "@/api/auth";
+import { useRouter } from "next/navigation";
+import { trucks } from "@/utils/truck-arrays";
+import UploadBar from "./upload-bar";
 interface MailProps {
   accounts: {
     label: string;
@@ -54,7 +58,19 @@ export function Mail({
 }: MailProps) {
   const [isCollapsed, setIsCollapsed] = React.useState(defaultCollapsed);
   const [mail] = useMail();
+  const router = useRouter();
 
+  async function sessionVerify() {
+    const response: any = await userVerification();
+    console.log(response);
+    if (!response.isAuthorized) {
+      router.push("/auth/signin");
+    }
+  }
+
+  React.useEffect(() => {
+    sessionVerify();
+  }, []);
   return (
     <TooltipProvider delayDuration={0}>
       <ResizablePanelGroup
@@ -109,18 +125,6 @@ export function Mail({
               },
             ]}
           />
-          <Separator />
-          <Nav
-            isCollapsed={isCollapsed}
-            links={[
-              {
-                title: "Logout",
-                href: "#",
-                icon: LogOut,
-                variant: "ghost",
-              },
-            ]}
-          />
         </ResizablePanel>
         <ResizableHandle withHandle />
         <ResizablePanel defaultSize={defaultLayout[1]} minSize={30}>
@@ -128,18 +132,15 @@ export function Mail({
             <div className="flex items-center px-4 py-3 ">
               <h1 className="text-xl font-bold">Mail Dashboard</h1>
             </div>
+            <TruckList items={trucks} />
           </div>
           <Separator />
-          <div className="mt-3">
-            <MailList items={mails} />
-          </div>
+          <div className="mt-3"></div>
         </ResizablePanel>
-        {/* <ResizableHandle withHandle /> */}
-        {/* <ResizablePanel defaultSize={defaultLayout[2]} minSize={30}>
-          <MailDisplay
-            mail={mails.find((item) => item.id === mail.selected) || null}
-          />
-        </ResizablePanel> */}
+        <ResizableHandle withHandle />
+        <ResizablePanel defaultSize={defaultLayout[2]} minSize={30}>
+          <SendMail />
+        </ResizablePanel>
       </ResizablePanelGroup>
     </TooltipProvider>
   );

@@ -1,72 +1,64 @@
 import { ComponentProps } from "react";
-import { formatDistanceToNow } from "date-fns/formatDistanceToNow";
-
+import { formatDistanceToNow } from "date-fns";
 import { cn } from "@/lib/utils";
 import { Badge } from "../badge";
 import { ScrollArea } from "../scroll-area";
-import { Separator } from "../separator";
-import { Mail } from "@/data/data";
-import { useMail } from "@/app/jotai/atoms/mail-atom";
+import { trucks } from "@/utils/truck-arrays";
 
-interface MailListProps {
-  items: Mail[];
+interface Truck {
+  id: number;
+  name: string;
+  type: string;
+  manufacturer: string;
+  year: number;
+  color: string;
+  engine: string;
+  horsepower: number;
+  towingCapacity: string;
+  price: string;
 }
 
-export function MailList({ items }: MailListProps) {
-  const [mail, setMail] = useMail();
+interface TruckListProps {
+  items: Truck[];
+}
 
+function TruckList({ items }: TruckListProps) {
   return (
     <ScrollArea className="h-screen">
       <div className="flex flex-col gap-2 p-4 pt-0">
-        {items.map((item) => (
+        {trucks.map((item: any) => (
           <button
             key={item.id}
             className={cn(
-              "flex flex-col items-start gap-2 rounded-lg border p-3 text-left text-sm transition-all hover:bg-accent",
-              mail.selected === item.id && "bg-muted"
+              "flex flex-col items-start gap-2 rounded-lg border p-3 text-left text-sm transition-all hover:bg-accent"
             )}
-            onClick={() =>
-              setMail({
-                ...mail,
-                selected: item.id,
-              })
-            }
           >
             <div className="flex w-full flex-col gap-1">
               <div className="flex items-center">
                 <div className="flex items-center gap-2">
                   <div className="font-semibold">{item.name}</div>
-                  {!item.read && (
-                    <span className="flex h-2 w-2 rounded-full bg-blue-600" />
-                  )}
+                  <span className="text-sm text-muted-foreground">
+                    ({item.manufacturer})
+                  </span>
                 </div>
                 <div
                   className={cn(
-                    "ml-auto text-xs",
-                    mail.selected === item.id
-                      ? "text-foreground"
-                      : "text-muted-foreground"
+                    "ml-auto text-xs"
                   )}
                 >
-                  {formatDistanceToNow(new Date(item.date), {
+                  {formatDistanceToNow(new Date(item.year), {
                     addSuffix: true,
                   })}
                 </div>
               </div>
-              <div className="text-xs font-medium">{item.subject}</div>
+              <div className="text-xs font-medium">
+                {item.type} - {item.color}
+              </div>
             </div>
             <div className="line-clamp-2 text-xs text-muted-foreground">
-              {item.text.substring(0, 300)}
+              Engine: {item.engine}, Horsepower: {item.horsepower}, Towing
+              Capacity: {item.towingCapacity}, Price: {item.price}
             </div>
-            {item.labels.length ? (
-              <div className="flex items-center gap-2">
-                {item.labels.map((label) => (
-                  <Badge key={label} variant={getBadgeVariantFromLabel(label)}>
-                    {label}
-                  </Badge>
-                ))}
-              </div>
-            ) : null}
           </button>
         ))}
       </div>
@@ -74,6 +66,7 @@ export function MailList({ items }: MailListProps) {
   );
 }
 
+export default TruckList;
 function getBadgeVariantFromLabel(
   label: string
 ): ComponentProps<typeof Badge>["variant"] {

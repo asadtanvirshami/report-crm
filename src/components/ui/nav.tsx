@@ -2,9 +2,12 @@
 
 import Link from "next/link";
 import { LucideIcon } from "lucide-react";
+import Cookies from "js-cookie";
 
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipTrigger, TooltipContent } from "./tooltip";
+import { Button } from "./button";
+import { useRouter } from "next/navigation";
 interface NavProps {
   isCollapsed: boolean;
   links: {
@@ -17,6 +20,7 @@ interface NavProps {
 }
 
 export function Nav({ links, isCollapsed }: NavProps) {
+  const router = useRouter();
   return (
     <div
       data-collapsed={isCollapsed}
@@ -50,27 +54,38 @@ export function Nav({ links, isCollapsed }: NavProps) {
               </TooltipContent>
             </Tooltip>
           ) : (
-            <Link
-              key={index}
-              href={link.href}
-              className={cn(
-                "flex items-center gap-2 rounded-md px-2 py-1 font-medium text-muted-foreground text-sm hover:bg-muted hover:text-black"
-              )}
-            >
-              <link.icon className="mr-2 h-4 w-4" />
-              {link.title}
-              {link.label && (
-                <span
-                  className={cn(
-                    "ml-auto",
-                    link.variant === "default" &&
-                      "text-background dark:text-white"
-                  )}
-                >
-                  {link.label}
-                </span>
-              )}
-            </Link>
+            <>
+              <Link
+                key={index}
+                href={link.href}
+                className={cn(
+                  "flex items-center gap-2 rounded-md px-2 py-1 font-medium text-muted-foreground text-sm hover:bg-muted hover:text-black"
+                )}
+              >
+                <link.icon className="mr-2 h-4 w-4" />
+                {link.title}
+                {link.label && (
+                  <span
+                    className={cn(
+                      "ml-auto",
+                      link.variant === "default" &&
+                        "text-background dark:text-white"
+                    )}
+                  >
+                    {link.label}
+                  </span>
+                )}
+              </Link>
+              <Button
+                onClick={() => {
+                  Cookies.remove("token");
+                  router.push("/auth/signin");
+                }}
+                className="mt-5 bg-violet-500 hover:bg-violet-500"
+              >
+                LOGOUT
+              </Button>
+            </>
           )
         )}
       </nav>

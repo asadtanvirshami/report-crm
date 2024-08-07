@@ -27,6 +27,7 @@ import { Loader2 } from "lucide-react";
 
 import { useRouter } from "next/navigation";
 import { userSigninRequest } from "@/api/auth";
+import Cookies from "js-cookie";
 
 type Props = {
   setIsSignUp: (active: boolean) => void;
@@ -58,7 +59,10 @@ const Signin = (props: Props) => {
       console.log(request);
 
       const data = await request.json();
+      console.log(data);
+      
       if (data?.success) {
+        Cookies.set("token", data?.data.token);
         toast({
           title: "Success",
           description: "Signin successful",

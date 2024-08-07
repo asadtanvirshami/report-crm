@@ -23,7 +23,7 @@ import React from "react";
 import { authSchema } from "@/validation/auth/authValidation";
 
 import { useToast } from "@/components/ui/use-toast";
-import { Loader2, Paperclip, Upload } from "lucide-react";
+import { Loader2, Paperclip } from "lucide-react";
 
 import { useRouter } from "next/navigation";
 import { userSigninRequest } from "@/api/auth";
@@ -50,7 +50,6 @@ const SendMail = (props: Props) => {
 
   const [isLoading, setIsLoading] = React.useState(false);
   const [attachment, setAttachment] = React.useState<File | null>(null);
-  const fileInputRef = React.useRef<HTMLInputElement | null>(null);
 
   const form = useForm<z.infer<typeof mailSchema>>({
     resolver: zodResolver(mailSchema),
@@ -59,6 +58,12 @@ const SendMail = (props: Props) => {
       message: "",
     },
   });
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      setAttachment(e.target.files[0]);
+    }
+  };
 
   const handleClickSignin = async (formValues: z.infer<typeof mailSchema>) => {
     console.log(formValues);
@@ -137,58 +142,10 @@ const SendMail = (props: Props) => {
     window.location.reload();
   };
 
-  const handleButtonClick = () => {
-    if (fileInputRef.current) {
-      fileInputRef.current.click();
-    }
-  };
-
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files && event.target.files.length > 0) {
-      const file = event.target.files[0];
-      // Handle the selected file
-      console.log("Selected file:", file);
-    }
-  };
-
   return (
     <div className="flex flex-col h-screen gap-2 p-4 pt-0">
-      <div className="flex mb-4 justify-center align-middle items-center">
-        <div className="flex space-x-2 mb-4 mt-4">
-          <Button
-            type="button"
-            onClick={handleDownloadPDF}
-            className="bg-blue-500"
-          >
-            Download PDF
-          </Button>
-          <Button
-            type="button"
-            onClick={handleDownloadXLSX}
-            className="bg-green-500"
-          >
-            Download XLSX
-          </Button>
-          <Button type="button" onClick={handlePrint} className="bg-orange-500">
-            Print
-          </Button>
-          <Button
-            onClick={handleButtonClick}
-            className="relative bg-red-500"
-          >
-            <Upload className="w-5 h-5 mr-2" />
-            Upload File
-          </Button>
-          <input
-            ref={fileInputRef}
-            type="file"
-            className="hidden"
-            onChange={handleFileChange}
-          />
-        </div>
-      </div>
       <div className="flex justify-center align-middle h-full items-center">
-        <Card className="w-[530px] h-fit">
+        <Card className=" h-fit">
           <CardHeader>
             <CardTitle className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0">
               Compose Email
@@ -238,7 +195,7 @@ const SendMail = (props: Props) => {
                     </FormItem>
                   )}
                 />
-
+           
                 <FormField
                   control={form.control}
                   name="message"
